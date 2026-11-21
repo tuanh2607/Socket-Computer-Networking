@@ -296,11 +296,18 @@ def send_file(path_text):
                 send_json(s, {"name": me["name"], "channel": "file"})
                 send_json(s, {"type": "FILE", "filename": path.name,
                               "size": path.stat().st_size})
+                total = path.stat().st_size
+                sent, last = 0, 0
                 with open(path, "rb") as f:
                     # Doc tung block 64 KB va gui het block qua TCP.
                     while chunk := f.read(65536):
                         s.sendall(chunk)
-            log(f"[*] Đã gửi xong {path.name}")
+                        sent += len(chunk)
+                        pct = sent * 100 // max(total, 1)
+                        if pct >= last + 10:          # in mỗi 10% để khỏi spam
+                            last = pct
+                            log(f"[*] Gửi {path.name}: {pct}%")
+                log(f"[*] Đã gửi xong {path.name}")
         except OSError as e:
             log(f"[!] Gửi file thất bại: {e}")
 
@@ -331,6 +338,9 @@ def main():
         parser.error("--name không được rỗng hoặc chứa ký tự '|'")
     # Luu thong tin cua tien trinh hien tai de broadcast va ket noi.
     me.update(name=args.name.strip(), port=args.port)
+
+
+
 
     # Tao socket TCP ma server dung de lang nghe ket noi chat den.
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
