@@ -60,7 +60,7 @@ def udp_broadcaster():
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     while True:
         msg = f"HELLO|{me['name']}|{me['port']}|{me['status']}".encode()
-        for addr in ("255.255.255.255", "127.255.255.255", "192.168.1.255"):  # LAN + cùng máy
+        for addr in ("255.255.255.255", "127.255.255.255", "192.168.1.255", "10.144.160.255"):
             try:
                 sock.sendto(msg, (addr, UDP_PORT))
             except OSError as e:
@@ -173,7 +173,6 @@ def handle_connection(conn, name=None):
 
 def accept_loop(server):
     while True:
-        # accept() cho den khi co client ket noi vao server socket.
         conn, _ = server.accept()
         threading.Thread(target=handle_connection, args=(conn,), daemon=True).start()
 
@@ -184,7 +183,6 @@ def peer_list():
 
 
 def connect_to(name):
-    """Tao hoac tai su dung ket noi chat den peer co ten duoc chon."""
     with lock:
         peer = peers.get(name)
         sock = peer_sockets.get(name)
@@ -210,7 +208,6 @@ def connect_to(name):
 
 
 def send_message(text):
-    """Gui text den peer dang chat va luu tin nhan vao lich su."""
     with lock:
         name = current["name"]
         sock = peer_sockets.get(name)
@@ -229,7 +226,6 @@ def send_message(text):
 
 
 def send_file(path_text):
-    #Gui file bang mot ket noi TCP rieng de khong chan kenh chat.
     path = Path(path_text).expanduser()
     with lock:
         peer = peers.get(current["name"])
