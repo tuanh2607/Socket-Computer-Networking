@@ -18,7 +18,10 @@ peer_sockets = {}  # tên -> socket chat đang mở
 histories = {}     # tên -> danh sách tin nhắn
 unread = {}        # tên -> số tin chưa đọc
 current = {"name": None}
-me = {"name": "", "port": 0, "status": "online"}
+me = {"name": "",
+      "port": 0, 
+      "status": "online"
+    }
 lock = threading.RLock()
 
 
